@@ -11,7 +11,7 @@ const path = require('path');
 const routes = require('./controllers');
 // Setting up port and requiring models for syncing
 const PORT = process.env.PORT || 3001;
-const db = require('./models');
+const mongoose = require('mongoose');
 // Bringing in Morgan, a nice logger for our server
 const morgan = require('morgan');
 // Compression
@@ -41,15 +41,14 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, './client/build/index.html'));
 });
 
-db.sequelize.sync({force:false}).then(function () {
-    if (process.env.NODE_ENV === 'test') {
-        db.User.create({ email: 'test@test.com', password: 'password' }).then(
-            () => {
-                console.log('Test User Created');
-            }
-        );
-    }
-    app.listen(PORT, function () {
-        console.log(`Server now on port ${PORT}!`);
-    });
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/project3', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+    useFindAndModify: false
 });
+
+app.listen(PORT, function () {
+    console.log(`Server now on port ${PORT}!`);
+});
+
